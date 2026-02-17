@@ -1,0 +1,26 @@
+{
+  "name": "devlink",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/AaronPrimmer/DevLink#readme",
+  "bugs": {
+    "url": "https://github.com/AaronPrimmer/DevLink/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AaronPrimmer/DevLink.git"
+  },
+  "license": "MIT",
+  "author": "",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mongoose": "^9.2.1"
+  }
+}
