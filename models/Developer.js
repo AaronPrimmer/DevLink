@@ -1,4 +1,7 @@
 const { Schema, model } = require("mongoose");
+const bcrypt = require("bcrypt");
+
+const SALT_FACTOR = 10;
 
 const developerSchema = new Schema(
   {
@@ -6,7 +9,7 @@ const developerSchema = new Schema(
     lastname: { type: String, required: true, trim: true },
     birthdate: { type: Date, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true, minlength: 8 },
+    password: { type: String, required: true },
     github: { type: String },
     linkedin: { type: String },
   },
@@ -18,6 +21,26 @@ const developerSchema = new Schema(
     id: false,
   },
 );
+
+developerSchema.pre("save", async function () {
+  const developer = this;
+
+  if (!developer.isModified("password")) {
+    return;
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(SALT_FACTOR);
+
+    developer.password = await bcrypt.hash(developer.password, salt);
+  } catch (err) {
+    return;
+  }
+});
+
+developerSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 developerSchema
   .virtual("fullName")

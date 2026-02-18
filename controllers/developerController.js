@@ -4,33 +4,33 @@ module.exports = {
   // Get all developers
   async getAllDevelopers(req, res) {
     try {
-      const developers = await Developer.find().select("-__v");
+      const developers = await Developer.find().select(
+        "-__v -password -birthdate",
+      );
       res.json(developers);
     } catch (err) {
-      res
-        .satus(500)
-        .json({
-          error: "Failed to retrieve developers",
-          errorMessage: err.message,
-        });
+      res.satus(500).json({
+        error: "Failed to retrieve developers",
+        errorMessage: err.message,
+      });
     }
   },
 
   // Get a single developer by ID
   async getDeveloperById(req, res) {
     try {
-      const developer = await Developer.findById(req.params.id).select("-__v");
+      const developer = await Developer.findById(req.params.id).select(
+        "-__v -password -birthdate",
+      );
       if (!developer) {
         return res.status(404).json({ error: "Developer not found" });
       }
       res.json(developer);
     } catch (err) {
-      res
-        .status(500)
-        .json({
-          error: "Failed to retrieve developer",
-          errorMessage: err.message,
-        });
+      res.status(500).json({
+        error: "Failed to retrieve developer",
+        errorMessage: err.message,
+      });
     }
   },
 
@@ -40,12 +40,10 @@ module.exports = {
       const createdDeveloper = await Developer.create(req.body);
       res.status(201).json(createdDeveloper);
     } catch (err) {
-      res
-        .status(400)
-        .json({
-          error: "Failed to create developer",
-          errorMessage: err.message,
-        });
+      res.status(400).json({
+        error: "Failed to create developer",
+        errorMessage: err.message,
+      });
     }
   },
 
@@ -62,12 +60,10 @@ module.exports = {
       }
       res.json(updatedDeveloper);
     } catch (err) {
-      res
-        .satus(500)
-        .json({
-          error: "Failed to update developer",
-          errorMessage: err.message,
-        });
+      res.satus(500).json({
+        error: "Failed to update developer",
+        errorMessage: err.message,
+      });
     }
   },
 
@@ -82,12 +78,10 @@ module.exports = {
       }
       res.json({ message: "Developer deleted successfully" });
     } catch (err) {
-      res
-        .status(500)
-        .json({
-          error: "Failed to delete developer",
-          errorMessage: err.message,
-        });
+      res.status(500).json({
+        error: "Failed to delete developer",
+        errorMessage: err.message,
+      });
     }
   },
 };
