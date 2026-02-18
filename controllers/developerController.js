@@ -9,7 +9,10 @@ module.exports = {
     } catch (err) {
       res
         .satus(500)
-        .json({ error: "Failed to retrieve developers", error: err.message });
+        .json({
+          error: "Failed to retrieve developers",
+          errorMessage: err.message,
+        });
     }
   },
 
@@ -24,7 +27,10 @@ module.exports = {
     } catch (err) {
       res
         .status(500)
-        .json({ error: "Failed to retrieve developer", error: err.message });
+        .json({
+          error: "Failed to retrieve developer",
+          errorMessage: err.message,
+        });
     }
   },
 
@@ -36,7 +42,10 @@ module.exports = {
     } catch (err) {
       res
         .status(400)
-        .json({ error: "Failed to create developer", error: err.message });
+        .json({
+          error: "Failed to create developer",
+          errorMessage: err.message,
+        });
     }
   },
 
@@ -55,7 +64,10 @@ module.exports = {
     } catch (err) {
       res
         .satus(500)
-        .json({ error: "Failed to update developer", error: err.message });
+        .json({
+          error: "Failed to update developer",
+          errorMessage: err.message,
+        });
     }
   },
 
@@ -72,7 +84,10 @@ module.exports = {
     } catch (err) {
       res
         .status(500)
-        .json({ error: "Failed to delete developer", error: err.message });
+        .json({
+          error: "Failed to delete developer",
+          errorMessage: err.message,
+        });
     }
   },
 };
