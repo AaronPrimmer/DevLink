@@ -6,6 +6,8 @@ const {
   createDeveloper,
   updateDeveloper,
   deleteDeveloper,
+  addConnection,
+  deleteConnection,
 } = require("../../controllers/developerController");
 
 // GET all developers
@@ -19,5 +21,11 @@ router
   .get(getDeveloperById)
   .put(updateDeveloper)
   .delete(deleteDeveloper);
+
+// Connection routes
+router
+  .route("/:developerId/connections/:connectionId")
+  .post(addConnection)
+  .delete(deleteConnection);
 
 module.exports = router;

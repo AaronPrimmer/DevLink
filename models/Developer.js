@@ -3,6 +3,15 @@ const bcrypt = require("bcrypt");
 
 const SALT_FACTOR = 10;
 
+const connectionSchema = new Schema({
+  connectionId: { type: Schema.Types.ObjectId, ref: "Developer" },
+  status: {
+    type: String,
+    enum: ["pending", "accepted", "rejected"],
+    default: "pending",
+  },
+});
+
 const developerSchema = new Schema(
   {
     firstname: { type: String, required: true, trim: true },
@@ -12,6 +21,7 @@ const developerSchema = new Schema(
     password: { type: String, required: true },
     github: { type: String },
     linkedin: { type: String },
+    connections: { type: [connectionSchema] },
   },
   {
     timestamps: true,

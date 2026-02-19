@@ -84,4 +84,50 @@ module.exports = {
       });
     }
   },
+  async addConnection(req, res) {
+    try {
+      const { developerId, connectionId } = req.params;
+      // const developer = await Developer.findById(developerId);
+      // if (!developer) {
+      //   return res.status(404).json({ error: "Developer not found" });
+      // }
+      const connection = await Developer.findByIdAndUpdate(
+        developerId,
+        {
+          $addToSet: {
+            connections: { connectionId: connectionId, status: "pending" },
+          },
+        },
+        { returnDocument: "after" },
+      );
+      if (!connection) {
+        return res.status(404).json({ error: "Connection not found" });
+      }
+      res.json(connection);
+    } catch (err) {
+      res.status(500).json({
+        error: "Failed to add connection",
+        errorMessage: err.message,
+      });
+    }
+  },
+  async deleteConnection(req, res) {
+    try {
+      const { developerId, connectionId } = req.params;
+      const deletedConnection = await Developer.findByIdAndUpdate(
+        developerId,
+        { $pull: { connections: { connectionId: connectionId } } },
+        { returnDocument: "after" },
+      );
+      if (!deletedConnection) {
+        return res.status(404).json({ error: "Connection not found" });
+      }
+      res.json(deletedConnection);
+    } catch (err) {
+      res.status(500).json({
+        error: "Failed to delete connection",
+        errorMessage: err.message,
+      });
+    }
+  },
 };
