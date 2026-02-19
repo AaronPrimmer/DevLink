@@ -20,9 +20,9 @@ module.exports = {
   // Get a single developer by ID
   async getDeveloperById(req, res) {
     try {
-      const developer = await Developer.findById(req.params.id).select(
-        "-__v -password -birthdate",
-      );
+      const developer = await Developer.findById(req.params.id)
+        .populate("connections.connectionId", "firstname lastname email")
+        .select("-__v -password -birthdate");
       if (!developer) {
         return res
           .status(404)
@@ -41,7 +41,9 @@ module.exports = {
   // Create a new developer
   async createDeveloper(req, res) {
     try {
-      const createdDeveloper = await Developer.create(req.body);
+      const createdDeveloper = await Developer.create(req.body).select(
+        "-__v -password -birthdate",
+      );
       res.status(201).json({ success: true, createdDeveloper });
     } catch (err) {
       res.status(400).json({
@@ -59,7 +61,7 @@ module.exports = {
         req.params.id,
         req.body,
         { new: true, runValidators: true },
-      ).select("-__v");
+      ).select("-__v -password -birthdate");
       if (!updatedDeveloper) {
         return res
           .status(404)
@@ -98,19 +100,26 @@ module.exports = {
   async addConnection(req, res) {
     try {
       const { developerId, connectionId } = req.params;
-      // const developer = await Developer.findById(developerId);
-      // if (!developer) {
-      //   return res.status(404).json({ error: "Developer not found" });
-      // }
+      const connectionSearch = await Developer.findOne({
+        _id: developerId,
+        "connections.connectionId": { $in: [connectionId] },
+      }).limit(1);
+
+      if (connectionSearch) {
+        return res
+          .status(200)
+          .json({ success: false, error: "Connection already exists" });
+      }
+
       const connection = await Developer.findByIdAndUpdate(
         developerId,
         {
           $addToSet: {
-            connections: { connectionId: connectionId, status: "pending" },
+            connections: { connectionId: connectionId },
           },
         },
         { returnDocument: "after" },
-      );
+      ).select("-__v -password -birthdate");
       if (!connection) {
         return res
           .status(404)
@@ -121,6 +130,38 @@ module.exports = {
       res.status(500).json({
         success: false,
         error: "Failed to add connection",
+        errorMessage: err.message,
+      });
+    }
+  },
+  async updateConnection(req, res) {
+    try {
+      const { developerId, connectionId } = req.params;
+      const { status } = req.body;
+      const updatedConnection = await Developer.findOne({
+        _id: developerId,
+        "connections.connectionId": { $in: [connectionId] },
+      }).limit(1);
+      if (!updatedConnection) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Connection not found" });
+      }
+      const connectionIndex = updatedConnection.connections.findIndex(
+        (conn) => conn.connectionId.toString() === connectionId,
+      );
+      if (connectionIndex === -1) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Connection not found" });
+      }
+      updatedConnection.connections[connectionIndex].status = status;
+      await updatedConnection.save();
+      res.json({ success: true, updatedConnection });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        error: "Failed to update connection",
         errorMessage: err.message,
       });
     }
