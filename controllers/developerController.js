@@ -41,10 +41,8 @@ module.exports = {
   // Create a new developer
   async createDeveloper(req, res) {
     try {
-      const createdDeveloper = await Developer.create(req.body).select(
-        "-__v -password -birthdate",
-      );
-      res.status(201).json({ success: true, createdDeveloper });
+      const createdDeveloper = await Developer.create(req.body);
+      res.status(201).json({ success: true, user: createdDeveloper.fullName });
     } catch (err) {
       res.status(400).json({
         success: false,
