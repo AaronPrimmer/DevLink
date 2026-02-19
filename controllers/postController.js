@@ -6,11 +6,15 @@ module.exports = {
   async getAllPosts(req, res) {
     try {
       const posts = await Post.find().select("-__v");
-      res.json(posts);
+      res.json({ success: true, posts });
     } catch (err) {
       res
         .status(500)
-        .json({ error: "Failed to retrieve posts", errorMessage: err.message });
+        .json({
+          success: false,
+          error: "Failed to retrieve posts",
+          errorMessage: err.message,
+        });
     }
   },
 
@@ -21,13 +25,19 @@ module.exports = {
         .populate("author", "firstname lastname")
         .select("-__v");
       if (!post) {
-        return res.status(404).json({ error: "Post not found" });
+        return res
+          .status(404)
+          .json({ success: false, error: "Post not found" });
       }
-      res.json(post);
+      res.json({ success: true, post });
     } catch (err) {
       res
         .status(500)
-        .json({ error: "Failed to retrieve post", errorMessage: err.message });
+        .json({
+          success: false,
+          error: "Failed to retrieve post",
+          errorMessage: err.message,
+        });
     }
   },
 
@@ -35,11 +45,15 @@ module.exports = {
   async createPost(req, res) {
     try {
       const createdPost = await Post.create(req.body);
-      res.status(201).json(createdPost);
+      res.status(201).json({ success: true, createdPost });
     } catch (err) {
       res
         .status(400)
-        .json({ error: "Failed to create post", errorMessage: err.message });
+        .json({
+          success: false,
+          error: "Failed to create post",
+          errorMessage: err.message,
+        });
     }
   },
 
@@ -52,13 +66,19 @@ module.exports = {
         { runValidators: true },
       );
       if (updatedPost.matchedCount === 0) {
-        return res.status(404).json({ error: "Post not found" });
+        return res
+          .status(404)
+          .json({ success: false, error: "Post not found" });
       }
-      res.json({ message: "Post updated successfully" });
+      res.json({ success: true, message: "Post updated successfully" });
     } catch (err) {
       res
         .status(400)
-        .json({ error: "Failed to update post", errorMessage: err.message });
+        .json({
+          success: false,
+          error: "Failed to update post",
+          errorMessage: err.message,
+        });
     }
   },
 
@@ -67,13 +87,19 @@ module.exports = {
     try {
       const deletedPost = await Post.deleteOne({ postId: req.params.id });
       if (deletedPost.deletedCount === 0) {
-        return res.status(404).json({ error: "Post not found" });
+        return res
+          .status(404)
+          .json({ success: false, error: "Post not found" });
       }
-      res.json({ message: "Post deleted successfully" });
+      res.json({ success: true, message: "Post deleted successfully" });
     } catch (err) {
       res
         .status(500)
-        .json({ error: "Failed to delete post", errorMessage: err.message });
+        .json({
+          success: false,
+          error: "Failed to delete post",
+          errorMessage: err.message,
+        });
     }
   },
 };

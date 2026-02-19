@@ -7,9 +7,10 @@ module.exports = {
       const developers = await Developer.find().select(
         "-__v -password -birthdate",
       );
-      res.json(developers);
+      res.json({ success: true, developers });
     } catch (err) {
       res.satus(500).json({
+        success: false,
         error: "Failed to retrieve developers",
         errorMessage: err.message,
       });
@@ -23,11 +24,14 @@ module.exports = {
         "-__v -password -birthdate",
       );
       if (!developer) {
-        return res.status(404).json({ error: "Developer not found" });
+        return res
+          .status(404)
+          .json({ success: false, error: "Developer not found" });
       }
-      res.json(developer);
+      res.json({ success: true, developer });
     } catch (err) {
       res.status(500).json({
+        success: false,
         error: "Failed to retrieve developer",
         errorMessage: err.message,
       });
@@ -38,9 +42,10 @@ module.exports = {
   async createDeveloper(req, res) {
     try {
       const createdDeveloper = await Developer.create(req.body);
-      res.status(201).json(createdDeveloper);
+      res.status(201).json({ success: true, createdDeveloper });
     } catch (err) {
       res.status(400).json({
+        success: false,
         error: "Failed to create developer",
         errorMessage: err.message,
       });
@@ -56,11 +61,14 @@ module.exports = {
         { new: true, runValidators: true },
       ).select("-__v");
       if (!updatedDeveloper) {
-        return res.status(404).json({ error: "Developer not found" });
+        return res
+          .status(404)
+          .json({ success: false, error: "Developer not found" });
       }
-      res.json(updatedDeveloper);
+      res.json({ success: true, updatedDeveloper });
     } catch (err) {
       res.satus(500).json({
+        success: false,
         error: "Failed to update developer",
         errorMessage: err.message,
       });
@@ -74,11 +82,14 @@ module.exports = {
         _id: req.params.id,
       });
       if (deletedDeveloper.deletedCount === 0) {
-        return res.status(404).json({ error: "Developer not found" });
+        return res
+          .status(404)
+          .json({ success: false, error: "Developer not found" });
       }
-      res.json({ message: "Developer deleted successfully" });
+      res.json({ success: true, message: "Developer deleted successfully" });
     } catch (err) {
       res.status(500).json({
+        success: false,
         error: "Failed to delete developer",
         errorMessage: err.message,
       });
@@ -101,11 +112,14 @@ module.exports = {
         { returnDocument: "after" },
       );
       if (!connection) {
-        return res.status(404).json({ error: "Connection not found" });
+        return res
+          .status(404)
+          .json({ success: false, error: "Connection not found" });
       }
-      res.json(connection);
+      res.json({ success: true, connection });
     } catch (err) {
       res.status(500).json({
+        success: false,
         error: "Failed to add connection",
         errorMessage: err.message,
       });
@@ -120,11 +134,14 @@ module.exports = {
         { returnDocument: "after" },
       );
       if (!deletedConnection) {
-        return res.status(404).json({ error: "Connection not found" });
+        return res
+          .status(404)
+          .json({ success: false, error: "Connection not found" });
       }
-      res.json(deletedConnection);
+      res.json({ success: true, deletedConnection });
     } catch (err) {
       res.status(500).json({
+        success: false,
         error: "Failed to delete connection",
         errorMessage: err.message,
       });
