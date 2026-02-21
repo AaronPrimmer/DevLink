@@ -1,4 +1,5 @@
 const Post = require("../models/Post");
+const Developer = require("../models/Developer");
 
 module.exports = {
   // Placeholder functions for post controller methods
@@ -41,6 +42,10 @@ module.exports = {
   async createPost(req, res) {
     try {
       const createdPost = await Post.create(req.body);
+      const addPostToDeveloper = await Developer.findByIdAndUpdate(
+        req.body.author,
+        { $push: { posts: createdPost.postId } },
+      );
       res.status(201).json({ success: true, createdPost });
     } catch (err) {
       res.status(400).json({
@@ -77,12 +82,27 @@ module.exports = {
   // Delete a post by ID
   async deletePost(req, res) {
     try {
-      const deletedPost = await Post.deleteOne({ postId: req.params.id });
+      const findAuthor = await Post.findOne({ postId: req.params.id }).select(
+        "author",
+      );
+      if (!findAuthor) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Post not found" });
+      }
+      const deletedPost = await Post.deleteOne(
+        { postId: req.params.id, author: findAuthor.author },
+        { returnDocument: "before" },
+      );
       if (deletedPost.deletedCount === 0) {
         return res
           .status(404)
           .json({ success: false, error: "Post not found" });
       }
+      const deletePostFromDeveloper = await Developer.findOneAndUpdate(
+        { _id: findAuthor.author },
+        { $pull: { posts: req.params.id } },
+      );
       res.json({ success: true, message: "Post deleted successfully" });
     } catch (err) {
       res.status(500).json({

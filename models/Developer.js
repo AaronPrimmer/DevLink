@@ -20,8 +20,10 @@ const developerSchema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     github: { type: String },
-    linkedin: { type: String },
+    linkedIn: { type: String },
     connections: { type: [connectionSchema] },
+    skills: { type: [String] },
+    posts: { type: [Schema.Types.ObjectId], ref: "Post" },
   },
   {
     timestamps: true,
@@ -61,5 +63,13 @@ developerSchema
     const [first, last] = name.split(" ");
     this.set({ firstname: first, lastname: last });
   });
+
+developerSchema.virtual("connectionCount").get(function () {
+  return this.connections.filter((conn) => conn.status === "accepted").length;
+});
+
+developerSchema.virtual("postCount", {}).get(async function () {
+  return;
+});
 
 module.exports = model("Developer", developerSchema);

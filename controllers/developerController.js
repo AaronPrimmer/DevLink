@@ -58,7 +58,7 @@ module.exports = {
       const updatedDeveloper = await Developer.findByIdAndUpdate(
         req.params.id,
         req.body,
-        { new: true, runValidators: true },
+        { returnDocument: "after", runValidators: true },
       ).select("-__v -password -birthdate");
       if (!updatedDeveloper) {
         return res
@@ -67,7 +67,7 @@ module.exports = {
       }
       res.json({ success: true, updatedDeveloper });
     } catch (err) {
-      res.satus(500).json({
+      res.status(500).json({
         success: false,
         error: "Failed to update developer",
         errorMessage: err.message,
