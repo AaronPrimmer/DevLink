@@ -6,8 +6,9 @@ const reactionSchema = new Schema(
       type: Schema.Types.ObjectId,
       default: () => new Types.ObjectId(),
     },
-    reactionBody: { type: String, required: true, maxlength: 280 },
-    username: { type: Schema.Types.ObjectId, ref: "Developer", required: true },
+    reaction: { type: Boolean, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "Developer", required: true },
+    postId: { type: Schema.Types.ObjectId, ref: "Post", required: true },
   },
   {
     timestamps: true,

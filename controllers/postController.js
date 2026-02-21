@@ -1,5 +1,6 @@
 const Post = require("../models/Post");
 const Developer = require("../models/Developer");
+const Reaction = require("../models/Reaction");
 
 module.exports = {
   // Placeholder functions for post controller methods
@@ -20,9 +21,10 @@ module.exports = {
   // Get a single post by ID
   async getPostById(req, res) {
     try {
-      const post = await Post.findById(req.params.id)
-        .populate("author", "firstname lastname")
-        .select("-__v");
+      const post = await Post.findOne({ postId: req.params.id }).populate(
+        "author",
+        "firstname lastname",
+      );
       if (!post) {
         return res
           .status(404)
@@ -41,7 +43,13 @@ module.exports = {
   // Create a new post
   async createPost(req, res) {
     try {
-      const createdPost = await Post.create(req.body);
+      const { title, content, author } = req.body;
+      const createdPost = await Post.create({
+        title,
+        content,
+        author,
+        reactions: { like: 0, dislike: 0 },
+      });
       const addPostToDeveloper = await Developer.findByIdAndUpdate(
         req.body.author,
         { $push: { posts: createdPost.postId } },
@@ -82,25 +90,21 @@ module.exports = {
   // Delete a post by ID
   async deletePost(req, res) {
     try {
-      const findAuthor = await Post.findOne({ postId: req.params.id }).select(
-        "author",
-      );
-      if (!findAuthor) {
+      const findAndDeleteAuthor = await Post.findOneAndDelete({
+        postId: req.params.id,
+      }).select("author");
+      if (!findAndDeleteAuthor) {
         return res
           .status(404)
           .json({ success: false, error: "Post not found" });
       }
-      const deletedPost = await Post.deleteOne(
-        { postId: req.params.id, author: findAuthor.author },
-        { returnDocument: "before" },
-      );
-      if (deletedPost.deletedCount === 0) {
+      if (findAndDeleteAuthor.deletedCount === 0) {
         return res
           .status(404)
           .json({ success: false, error: "Post not found" });
       }
       const deletePostFromDeveloper = await Developer.findOneAndUpdate(
-        { _id: findAuthor.author },
+        { _id: findAndDeleteAuthor.author },
         { $pull: { posts: req.params.id } },
       );
       res.json({ success: true, message: "Post deleted successfully" });
@@ -113,7 +117,27 @@ module.exports = {
     }
   },
   // Create a new reaction
-  async createReaction(req, res) {},
+  async createReaction(req, res) {
+    try {
+      const { reaction, userId, postId } = req.body;
+      const createdReaction = await Reaction.create(req.body);
+      // Update the post's reactions count
+      const updatePostReactions = await Post.findOneAndUpdate(
+        { postId },
+        {
+          $inc: reaction ? { "reactions.like": 1 } : { "reactions.dislike": 1 },
+        },
+        { returnDocument: "after" },
+      );
+      res.status(201).json({ success: true, createdReaction });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: "Failed to create reaction",
+        errorMessage: err.message,
+      });
+    }
+  },
 
   // Get a reaction by ID
   async getReactionById(req, res) {},

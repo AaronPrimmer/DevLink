@@ -18,7 +18,7 @@ router.route("/").get(getAllPosts).post(createPost);
 router.route("/:id").get(getPostById).put(updatePost).delete(deletePost);
 
 // POST a new reaction
-router.route("/:id/reactions").post(createReaction);
+router.route("/reaction").post(createReaction);
 
 // GET, PUT, DELETE a reaction by ID
 router

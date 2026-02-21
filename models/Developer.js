@@ -21,9 +21,9 @@ const developerSchema = new Schema(
     password: { type: String, required: true },
     github: { type: String },
     linkedIn: { type: String },
-    connections: { type: [connectionSchema] },
-    skills: { type: [String] },
-    posts: { type: [Schema.Types.ObjectId], ref: "Post" },
+    connections: [{ type: connectionSchema }],
+    skills: [{ type: String }],
+    posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
   },
   {
     timestamps: true,
@@ -65,11 +65,19 @@ developerSchema
   });
 
 developerSchema.virtual("connectionCount").get(function () {
-  return this.connections.filter((conn) => conn.status === "accepted").length;
+  if (!this.connections) {
+    return 0;
+  } else {
+    return this.connections.length;
+  }
 });
 
-developerSchema.virtual("postCount", {}).get(async function () {
-  return;
+developerSchema.virtual("postCount", {}).get(function () {
+  if (!this.posts) {
+    return 0;
+  } else {
+    return this.posts.length;
+  }
 });
 
 module.exports = model("Developer", developerSchema);
