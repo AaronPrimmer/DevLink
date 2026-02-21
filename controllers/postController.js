@@ -8,13 +8,11 @@ module.exports = {
       const posts = await Post.find().select("-__v");
       res.json({ success: true, posts });
     } catch (err) {
-      res
-        .status(500)
-        .json({
-          success: false,
-          error: "Failed to retrieve posts",
-          errorMessage: err.message,
-        });
+      res.status(500).json({
+        success: false,
+        error: "Failed to retrieve posts",
+        errorMessage: err.message,
+      });
     }
   },
 
@@ -31,13 +29,11 @@ module.exports = {
       }
       res.json({ success: true, post });
     } catch (err) {
-      res
-        .status(500)
-        .json({
-          success: false,
-          error: "Failed to retrieve post",
-          errorMessage: err.message,
-        });
+      res.status(500).json({
+        success: false,
+        error: "Failed to retrieve post",
+        errorMessage: err.message,
+      });
     }
   },
 
@@ -47,13 +43,11 @@ module.exports = {
       const createdPost = await Post.create(req.body);
       res.status(201).json({ success: true, createdPost });
     } catch (err) {
-      res
-        .status(400)
-        .json({
-          success: false,
-          error: "Failed to create post",
-          errorMessage: err.message,
-        });
+      res.status(400).json({
+        success: false,
+        error: "Failed to create post",
+        errorMessage: err.message,
+      });
     }
   },
 
@@ -72,13 +66,11 @@ module.exports = {
       }
       res.json({ success: true, message: "Post updated successfully" });
     } catch (err) {
-      res
-        .status(400)
-        .json({
-          success: false,
-          error: "Failed to update post",
-          errorMessage: err.message,
-        });
+      res.status(400).json({
+        success: false,
+        error: "Failed to update post",
+        errorMessage: err.message,
+      });
     }
   },
 
@@ -93,13 +85,22 @@ module.exports = {
       }
       res.json({ success: true, message: "Post deleted successfully" });
     } catch (err) {
-      res
-        .status(500)
-        .json({
-          success: false,
-          error: "Failed to delete post",
-          errorMessage: err.message,
-        });
+      res.status(500).json({
+        success: false,
+        error: "Failed to delete post",
+        errorMessage: err.message,
+      });
     }
   },
+  // Create a new reaction
+  async createReaction(req, res) {},
+
+  // Get a reaction by ID
+  async getReactionById(req, res) {},
+
+  // Delete a reaction by ID
+  async deleteReaction(req, res) {},
+
+  // Update a reaction by ID
+  async updateReaction(req, res) {},
 };
