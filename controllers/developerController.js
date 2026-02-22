@@ -118,10 +118,19 @@ module.exports = {
         },
         { returnDocument: "after" },
       ).select("-__v -password -birthdate");
-      if (!connection) {
+      const connectionUser = await Developer.findByIdAndUpdate(
+        connectionId,
+        {
+          $addToSet: {
+            connections: { connectionId: developerId },
+          },
+        },
+        { returnDocument: "after" },
+      ).select("-__v -password -birthdate");
+      if (!connection || !connectionUser) {
         return res
           .status(404)
-          .json({ success: false, error: "Connection not found" });
+          .json({ success: false, error: "Connection not updated" });
       }
       res.json({ success: true, connection });
     } catch (err) {
@@ -140,21 +149,30 @@ module.exports = {
         _id: developerId,
         "connections.connectionId": { $in: [connectionId] },
       }).limit(1);
-      if (!updatedConnection) {
+      const updatedConnectionUser = await Developer.findOne({
+        _id: connectionId,
+        "connections.connectionId": { $in: [developerId] },
+      }).limit(1);
+      if (!updatedConnection || !updatedConnectionUser) {
         return res
           .status(404)
-          .json({ success: false, error: "Connection not found" });
+          .json({ success: false, error: "Connections not found" });
       }
       const connectionIndex = updatedConnection.connections.findIndex(
         (conn) => conn.connectionId.toString() === connectionId,
       );
-      if (connectionIndex === -1) {
+      const connectionUserIndex = updatedConnectionUser.connections.findIndex(
+        (conn) => conn.connectionId.toString() === developerId,
+      );
+      if (connectionIndex === -1 || connectionUserIndex === -1) {
         return res
           .status(404)
           .json({ success: false, error: "Connection not found" });
       }
       updatedConnection.connections[connectionIndex].status = status;
+      updatedConnectionUser.connections[connectionUserIndex].status = status;
       await updatedConnection.save();
+      await updatedConnectionUser.save();
       res.json({ success: true, updatedConnection });
     } catch (err) {
       res.status(500).json({
@@ -172,7 +190,12 @@ module.exports = {
         { $pull: { connections: { connectionId: connectionId } } },
         { returnDocument: "after" },
       );
-      if (!deletedConnection) {
+      const deletedConnectionUser = await Developer.findByIdAndUpdate(
+        connectionId,
+        { $pull: { connections: { connectionId: developerId } } },
+        { returnDocument: "after" },
+      );
+      if (!deletedConnection || !deletedConnectionUser) {
         return res
           .status(404)
           .json({ success: false, error: "Connection not found" });
