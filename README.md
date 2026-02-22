@@ -53,7 +53,7 @@ DB_URL="url_of_db" (optional for external database)
 | Method   | Endpoint              | Description                       |
 | -------- | --------------------- | --------------------------------- |
 | `POST`   | `/api/developers`     | Create a developer profile        |
-| `GET`    | `/api/developers/`    | Get all developer profiles        |
+| `GET`    | `/api/developers`     | Get all developer profiles        |
 | `GET`    | `/api/developers/:id` | Get the current user's profile    |
 | `PUT`    | `/api/developers/:id` | Update the current user's profile |
 | `DELETE` | `/api/developers/:id` | Delete the current user's profile |
@@ -61,7 +61,7 @@ DB_URL="url_of_db" (optional for external database)
 #### Example Request — Create Profile
 
 ```json
-POST /api/profile
+POST /api/developers
 
 {
   "firstname": "Joe",
