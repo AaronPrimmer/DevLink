@@ -6,7 +6,6 @@ const {
   updatePost,
   deletePost,
   createReaction,
-  getReactionById,
   deleteReaction,
   updateReaction,
 } = require("../../controllers/postController");
@@ -23,7 +22,6 @@ router.route("/reaction").post(createReaction);
 // GET, PUT, DELETE a reaction by ID
 router
   .route("/:id/reactions/:reactionId")
-  .get(getReactionById)
   .put(updateReaction)
   .delete(deleteReaction);
 

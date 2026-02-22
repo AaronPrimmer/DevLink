@@ -120,6 +120,16 @@ module.exports = {
   async createReaction(req, res) {
     try {
       const { reaction, userId, postId } = req.body;
+      const findReaction = await Reaction.findOne({
+        userId: userId,
+        postId: postId,
+      });
+      if (findReaction) {
+        return res.status(400).json({
+          success: false,
+          error: "User has already reacted to this post",
+        });
+      }
       const createdReaction = await Reaction.create(req.body);
       // Update the post's reactions count
       const updatePostReactions = await Post.findOneAndUpdate(
@@ -139,12 +149,94 @@ module.exports = {
     }
   },
 
-  // Get a reaction by ID
-  async getReactionById(req, res) {},
-
   // Delete a reaction by ID
-  async deleteReaction(req, res) {},
+  async deleteReaction(req, res) {
+    try {
+      const { id, reactionId } = req.params;
+      const findReaction = await Reaction.findOne({
+        reactionId: reactionId,
+      }).select("userId reaction");
+      if (!findReaction) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Reaction not found" });
+      }
+      const deleteReaction = await Reaction.deleteOne({
+        reactionId: reactionId,
+      });
+      if (deleteReaction.deletedCount === 0) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Reaction not Deleted" });
+      }
+      console.log(JSON.stringify(findReaction));
+      if (findReaction) {
+        const updatePostReactions = await Post.findOneAndUpdate(
+          { postId: id },
+          {
+            $inc: findReaction.reaction
+              ? { "reactions.like": -1 }
+              : { "reactions.dislike": -1 },
+          },
+        );
+      }
+
+      res.json({ success: true, message: "Reaction deleted successfully" });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        error: "Failed to delete reaction",
+        errorMessage: err.message,
+      });
+    }
+  },
 
   // Update a reaction by ID
-  async updateReaction(req, res) {},
+  async updateReaction(req, res) {
+    try {
+      const { id, reactionId } = req.params;
+      const findReaction = await Reaction.findOne({
+        reactionId: reactionId,
+        postId: id,
+      }).select("reaction userId");
+      if (!findReaction) {
+        return res.status(404).json({
+          success: false,
+          error: "Reaction not found",
+        });
+      }
+      if (findReaction.reaction === req.body.reaction) {
+        return res.status(400).json({
+          success: false,
+          error: "Reaction is the same as the current reaction",
+        });
+      }
+      const updatedReaction = await Reaction.findOneAndUpdate(
+        { reactionId: reactionId, postId: id, userId: findReaction.userId },
+        { $set: { reaction: req.body.reaction } },
+        { returnDocument: "after" },
+      );
+      if (!updatedReaction) {
+        return res.status(404).json({
+          success: false,
+          error: "Failed to update reaction",
+        });
+      }
+      const updatePostReactions = await Post.findOneAndUpdate(
+        { postId: id },
+        {
+          $inc: updatedReaction.reaction
+            ? { "reactions.like": 1, "reactions.dislike": -1 }
+            : { "reactions.like": -1, "reactions.dislike": 1 },
+        },
+      );
+      res.json({ success: true, updatedReaction });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        error: "Failed to update reaction",
+        errorMessage: err.message,
+      });
+    }
+  },
 };
