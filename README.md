@@ -11,6 +11,7 @@ DevLink allows developers to create profiles, share posts, react to content, and
 - **Runtime:** Node.js
 - **Framework:** Express.js
 - **Database:** MongoDB (via Mongoose ODM)
+- **Testing** Insomnia
 
 ---
 
@@ -18,7 +19,7 @@ DevLink allows developers to create profiles, share posts, react to content, and
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/devlink.git
+git clone https://github.com/AaronPrimmer/devlink.git
 cd devlink
 
 # Install dependencies
@@ -29,6 +30,9 @@ cp .env.EXAMPLE .env
 
 # Start the server
 npm start
+
+# **To Use Nodemon**
+npm run dev
 ```
 
 ### Environment Variables
@@ -89,7 +93,8 @@ POST /api/posts
 
 {
   "title": "My First DevLink Post",
-  "content": "Excited to share my latest project with the community!"
+  "content": "Excited to share my latest project with the community!",
+  "author": "USER_OBJECTID"
 }
 ```
 
@@ -99,13 +104,11 @@ POST /api/posts
 
 Reactions are tied to a specific post.
 
-| Method   | Endpoint                           | Description                  |
-| -------- | ---------------------------------- | ---------------------------- |
-| `POST`   | `/api/posts/:postId/reactions`     | Add a reaction to a post     |
-| `GET`    | `/api/posts/:postId/reactions`     | Get all reactions for a post |
-| `GET`    | `/api/posts/:postId/reactions/:id` | Get a specific reaction      |
-| `PUT`    | `/api/posts/:postId/reactions/:id` | Update a reaction            |
-| `DELETE` | `/api/posts/:postId/reactions/:id` | Delete a reaction            |
+| Method   | Endpoint                           | Description              |
+| -------- | ---------------------------------- | ------------------------ |
+| `POST`   | `/api/posts/reaction`              | Add a reaction to a post |
+| `PUT`    | `/api/posts/:postId/reactions/:id` | Update a reaction        |
+| `DELETE` | `/api/posts/:postId/reactions/:id` | Delete a reaction        |
 
 ---
 
