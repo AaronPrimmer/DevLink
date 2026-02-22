@@ -169,7 +169,6 @@ module.exports = {
           .status(404)
           .json({ success: false, error: "Reaction not Deleted" });
       }
-      console.log(JSON.stringify(findReaction));
       if (findReaction) {
         const updatePostReactions = await Post.findOneAndUpdate(
           { postId: id },
