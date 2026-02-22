@@ -69,6 +69,7 @@ POST /api/profile
   "email": "email@email.com",
   "birthdate": "DATETIME",
   "password": "password",
+  "skills": ["Javascript", "HTML", "CSS"],
   "github": "YOUR_HANDLE(OPTIONAL)",
   "linkedIn": "YOUR_HANDLE(OPTIONAL)"
 }
